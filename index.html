@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WFM Agent Schedules</title>
+  <title>WFM May 2025 Agent Schedule</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,34 +15,39 @@
       color: #333;
     }
 
-    .agent-buttons {
-      display: flex;
-      flex-wrap: wrap;
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
       gap: 10px;
-      justify-content: center;
-      margin-bottom: 30px;
+      max-width: 600px;
+      margin: 20px auto;
     }
 
-    .agent-buttons button {
-      padding: 10px 15px;
-      font-size: 14px;
-      border: none;
+    .calendar div {
+      background: white;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .calendar .header {
+      font-weight: bold;
       background: #6c63ff;
       color: white;
-      border-radius: 5px;
-      cursor: pointer;
     }
 
-    .agent-buttons button:hover {
-      background: #4b45c2;
+    .calendar .day:hover {
+      background: #e0e0ff;
     }
 
     .schedule-table {
-      display: none;
       max-width: 700px;
-      margin: 0 auto;
+      margin: 30px auto;
       border-collapse: collapse;
       width: 100%;
+      display: none;
     }
 
     .schedule-table th, .schedule-table td {
@@ -59,61 +64,102 @@
     .working { background-color: #d4edda; }
     .leave { background-color: #f8d7da; }
     .off { background-color: #e2e3e5; }
-
-    .hidden { display: none; }
   </style>
 </head>
 <body>
 
-  <h1>WFM Agent Schedules</h1>
+  <h1>WFM Shift Schedule – May 2025</h1>
 
-  <div class="agent-buttons">
-    <button onclick="showSchedule('agent1')">Agent 1</button>
-    <button onclick="showSchedule('agent2')">Agent 2</button>
-    <button disabled>Agent 3</button>
-    <button disabled>Agent 4</button>
-    <button disabled>Agent 5</button>
-    <button disabled>Agent 6</button>
-    <button disabled>Agent 7</button>
-    <button disabled>Agent 8</button>
-    <button disabled>Agent 9</button>
-    <button disabled>Agent 10</button>
+  <div class="calendar">
+    <div class="header">Sun</div><div class="header">Mon</div><div class="header">Tue</div>
+    <div class="header">Wed</div><div class="header">Thu</div><div class="header">Fri</div><div class="header">Sat</div>
+
+    <!-- May 2025 starts on Thursday -->
+    <div></div><div></div><div></div><div></div>
+    <!-- 1st May is Thursday -->
+    <!-- Use JavaScript to generate 31 days -->
+    <script>
+      for (let i = 1; i <= 31; i++) {
+        document.write(`<div class="day" onclick="showSchedule(${i})">${i}</div>`);
+      }
+    </script>
   </div>
 
-  <!-- Agent 1 Schedule -->
-  <table id="agent1" class="schedule-table">
-    <tr>
-      <th>Day</th>
-      <th>Schedule</th>
-    </tr>
-    <tr><td>Monday</td><td class="working">08:00 - 17:00</td></tr>
-    <tr><td>Tuesday</td><td class="working">08:00 - 17:00</td></tr>
-    <tr><td>Wednesday</td><td class="leave">Leave</td></tr>
-    <tr><td>Thursday</td><td class="off">Off</td></tr>
-    <tr><td>Friday</td><td class="working">08:00 - 17:00</td></tr>
-  </table>
-
-  <!-- Agent 2 Schedule -->
-  <table id="agent2" class="schedule-table">
-    <tr>
-      <th>Day</th>
-      <th>Schedule</th>
-    </tr>
-    <tr><td>Monday</td><td class="leave">Leave</td></tr>
-    <tr><td>Tuesday</td><td class="working">08:00 - 17:00</td></tr>
-    <tr><td>Wednesday</td><td class="working">08:00 - 17:00</td></tr>
-    <tr><td>Thursday</td><td class="off">Off</td></tr>
-    <tr><td>Friday</td><td class="working">08:00 - 17:00</td></tr>
+  <table class="schedule-table" id="scheduleTable">
+    <thead>
+      <tr>
+        <th>Agent</th>
+        <th>Schedule</th>
+      </tr>
+    </thead>
+    <tbody id="scheduleBody"></tbody>
   </table>
 
   <script>
-    function showSchedule(agentId) {
-      // Hide all tables
-      const tables = document.querySelectorAll('.schedule-table');
-      tables.forEach(table => table.style.display = 'none');
+    // Example schedule data for agents
+    const scheduleData = {
+      1: {
+        'Agent 1': '08:00 - 17:00',
+        'Agent 2': 'Leave',
+        'Agent 3': 'Off',
+        'Agent 4': '08:00 - 17:00',
+        'Agent 5': '08:00 - 17:00',
+        'Agent 6': 'Leave',
+        'Agent 7': '08:00 - 17:00',
+        'Agent 8': '08:00 - 17:00',
+        'Agent 9': 'Off',
+        'Agent 10': '08:00 - 17:00'
+      },
+      2: {
+        'Agent 1': 'Leave',
+        'Agent 2': '08:00 - 17:00',
+        'Agent 3': '08:00 - 17:00',
+        'Agent 4': 'Off',
+        'Agent 5': '08:00 - 17:00',
+        'Agent 6': '08:00 - 17:00',
+        'Agent 7': 'Leave',
+        'Agent 8': '08:00 - 17:00',
+        'Agent 9': '08:00 - 17:00',
+        'Agent 10': 'Off'
+      },
+      // Add more days up to 31
+    };
 
-      // Show selected agent's schedule
-      document.getElementById(agentId).style.display = 'table';
+    function showSchedule(day) {
+      const table = document.getElementById("scheduleTable");
+      const tbody = document.getElementById("scheduleBody");
+      tbody.innerHTML = "";
+
+      const daySchedule = scheduleData[day];
+
+      if (daySchedule) {
+        for (const agent in daySchedule) {
+          const shift = daySchedule[agent];
+          const row = document.createElement("tr");
+          const tdAgent = document.createElement("td");
+          const tdShift = document.createElement("td");
+
+          tdAgent.textContent = agent;
+          tdShift.textContent = shift;
+
+          if (shift.toLowerCase().includes("leave")) {
+            tdShift.className = "leave";
+          } else if (shift.toLowerCase().includes("off")) {
+            tdShift.className = "off";
+          } else {
+            tdShift.className = "working";
+          }
+
+          row.appendChild(tdAgent);
+          row.appendChild(tdShift);
+          tbody.appendChild(row);
+        }
+
+        table.style.display = "table";
+      } else {
+        tbody.innerHTML = "<tr><td colspan='2'>No data available for this day.</td></tr>";
+        table.style.display = "table";
+      }
     }
   </script>
 
