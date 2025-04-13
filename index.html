@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WFM May 2025 Agent Schedule</title>
+  <title>WFM Full Agent Schedule – May 2025</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f0f5;
+      background: #f9f9fb;
       padding: 20px;
     }
 
@@ -15,50 +15,33 @@
       color: #333;
     }
 
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-      max-width: 600px;
-      margin: 20px auto;
-    }
-
-    .calendar div {
-      background: white;
-      padding: 15px;
-      text-align: center;
-      cursor: pointer;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    .calendar .header {
-      font-weight: bold;
-      background: #6c63ff;
-      color: white;
-    }
-
-    .calendar .day:hover {
-      background: #e0e0ff;
-    }
-
     .schedule-table {
-      max-width: 700px;
-      margin: 30px auto;
       border-collapse: collapse;
       width: 100%;
-      display: none;
+      overflow-x: auto;
     }
 
     .schedule-table th, .schedule-table td {
-      padding: 10px;
       border: 1px solid #ccc;
+      padding: 8px;
       text-align: center;
+      font-size: 12px;
     }
 
     .schedule-table th {
       background-color: #6c63ff;
       color: white;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .agent-name {
+      font-weight: bold;
+      background: #f0f0f5;
+      position: sticky;
+      left: 0;
+      z-index: 1;
     }
 
     .working { background-color: #d4edda; }
@@ -68,100 +51,51 @@
 </head>
 <body>
 
-  <h1>WFM Shift Schedule – May 2025</h1>
+  <h1>May 2025 Agent Shift Schedule</h1>
 
-  <div class="calendar">
-    <div class="header">Sun</div><div class="header">Mon</div><div class="header">Tue</div>
-    <div class="header">Wed</div><div class="header">Thu</div><div class="header">Fri</div><div class="header">Sat</div>
+  <div style="overflow-x: auto;">
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <!-- Generate days 1 to 31 -->
+          <script>
+            for (let d = 1; d <= 31; d++) {
+              document.write(`<th>May ${d}</th>`);
+            }
+          </script>
+        </tr>
+      </thead>
+      <tbody>
+        <script>
+          const agents = [
+            "Agent 1", "Agent 2", "Agent 3", "Agent 4", "Agent 5",
+            "Agent 6", "Agent 7", "Agent 8", "Agent 9", "Agent 10"
+          ];
 
-    <!-- May 2025 starts on Thursday -->
-    <div></div><div></div><div></div><div></div>
-    <!-- 1st May is Thursday -->
-    <!-- Use JavaScript to generate 31 days -->
-    <script>
-      for (let i = 1; i <= 31; i++) {
-        document.write(`<div class="day" onclick="showSchedule(${i})">${i}</div>`);
-      }
-    </script>
-  </div>
+          // Sample shift options
+          const shiftTypes = ["08:00 - 17:00", "Leave", "Off"];
 
-  <table class="schedule-table" id="scheduleTable">
-    <thead>
-      <tr>
-        <th>Agent</th>
-        <th>Schedule</th>
-      </tr>
-    </thead>
-    <tbody id="scheduleBody"></tbody>
-  </table>
-
-  <script>
-    // Example schedule data for agents
-    const scheduleData = {
-      1: {
-        'Agent 1': '08:00 - 17:00',
-        'Agent 2': 'Leave',
-        'Agent 3': 'Off',
-        'Agent 4': '08:00 - 17:00',
-        'Agent 5': '08:00 - 17:00',
-        'Agent 6': 'Leave',
-        'Agent 7': '08:00 - 17:00',
-        'Agent 8': '08:00 - 17:00',
-        'Agent 9': 'Off',
-        'Agent 10': '08:00 - 17:00'
-      },
-      2: {
-        'Agent 1': 'Leave',
-        'Agent 2': '08:00 - 17:00',
-        'Agent 3': '08:00 - 17:00',
-        'Agent 4': 'Off',
-        'Agent 5': '08:00 - 17:00',
-        'Agent 6': '08:00 - 17:00',
-        'Agent 7': 'Leave',
-        'Agent 8': '08:00 - 17:00',
-        'Agent 9': '08:00 - 17:00',
-        'Agent 10': 'Off'
-      },
-      // Add more days up to 31
-    };
-
-    function showSchedule(day) {
-      const table = document.getElementById("scheduleTable");
-      const tbody = document.getElementById("scheduleBody");
-      tbody.innerHTML = "";
-
-      const daySchedule = scheduleData[day];
-
-      if (daySchedule) {
-        for (const agent in daySchedule) {
-          const shift = daySchedule[agent];
-          const row = document.createElement("tr");
-          const tdAgent = document.createElement("td");
-          const tdShift = document.createElement("td");
-
-          tdAgent.textContent = agent;
-          tdShift.textContent = shift;
-
-          if (shift.toLowerCase().includes("leave")) {
-            tdShift.className = "leave";
-          } else if (shift.toLowerCase().includes("off")) {
-            tdShift.className = "off";
-          } else {
-            tdShift.className = "working";
+          function getRandomShift() {
+            return shiftTypes[Math.floor(Math.random() * shiftTypes.length)];
           }
 
-          row.appendChild(tdAgent);
-          row.appendChild(tdShift);
-          tbody.appendChild(row);
-        }
-
-        table.style.display = "table";
-      } else {
-        tbody.innerHTML = "<tr><td colspan='2'>No data available for this day.</td></tr>";
-        table.style.display = "table";
-      }
-    }
-  </script>
+          agents.forEach(agent => {
+            document.write(`<tr><td class="agent-name">${agent}</td>`);
+            for (let d = 1; d <= 31; d++) {
+              const shift = getRandomShift();
+              let className = "";
+              if (shift === "Leave") className = "leave";
+              else if (shift === "Off") className = "off";
+              else className = "working";
+              document.write(`<td class="${className}">${shift}</td>`);
+            }
+            document.write(`</tr>`);
+          });
+        </script>
+      </tbody>
+    </table>
+  </div>
 
 </body>
 </html>
