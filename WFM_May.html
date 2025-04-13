@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WFM Full Agent Schedule – May 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9fb;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      margin: 20px auto;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    .legend {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .legend span {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 5px;
+      border-radius: 4px;
+      color: #000;
+    }
+
+    .working { background-color: #d4edda; }
+    .leave { background-color: #f8d7da; }
+    .off { background-color: #e2e3e5; }
+
+    .schedule-table {
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .schedule-table th, .schedule-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .schedule-table th {
+      background-color: #6c63ff;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .agent-name {
+      font-weight: bold;
+      background: #f0f0f5;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+    }
+
+    .btn-export {
+      margin: 20px auto;
+      display: block;
+      padding: 10px 20px;
+      background-color: #6c63ff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-export:hover {
+      background-color: #4b45c2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>May 2025 Agent Shift Schedule</h1>
+
+  <div class="filters">
+    <label>Filter by Agent:
+      <select id="agentFilter" onchange="filterTable()">
+        <option value="">All Agents</option>
+      </select>
+    </label>
+
+    <label>Filter by Day:
+      <select id="dayFilter" onchange="filterTable()">
+        <option value="">All Days</option>
+      </select>
+    </label>
+  </div>
+
+  <button class="btn-export" onclick="exportTableToCSV('may-2025-agent-schedule.csv')">Export to CSV</button>
+
+  <div style="overflow-x: auto;">
+    <table class="schedule-table" id="scheduleTable">
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <script>
+            for (let d = 1; d <= 31; d++) {
+              document.write(`<th>May ${d}</th>`);
+              const option = document.createElement('option');
+              option.value = d;
+              option.textContent = `May ${d}`;
+              document.addEventListener("DOMContentLoaded", () => document.getElementById('dayFilter').appendChild(option));
+            }
+          </script>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <span class="working">Working</span>
+    <span class="leave">Leave</span>
+    <span class="off">Off</span>
+  </div>
+
+  <script>
+    const agents = [
+      "Agent 1", "Agent 2", "Agent 3", "Agent 4", "Agent 5",
+      "Agent 6", "Agent 7", "Agent 8", "Agent 9", "Agent 10"
+    ];
+
+    const shiftPlan = {};
+    for (let i = 0; i < agents.length; i++) {
+      shiftPlan[agents[i]] = Array.from({length: 31}, (_, d) => {
+        if ((d + i) % 7 === 0) return "Leave";
+        else if ((d + i) % 6 === 0) return "Off";
+        else return "08:00 - 17:00";
+      });
+    }
+
+    const tableBody = document.getElementById("tableBody");
+    function renderTable() {
+      tableBody.innerHTML = "";
+      const agentSelect = document.getElementById("agentFilter");
+      agentSelect.innerHTML = '<option value="">All Agents</option>';
+
+      agents.forEach(agent => {
+        const option = document.createElement("option");
+        option.value = agent;
+        option.textContent = agent;
+        agentSelect.appendChild(option);
+
+        const row = document.createElement("tr");
+        row.setAttribute("data-agent", agent);
+        row.innerHTML = `<td class="agent-name">${agent}</td>`;
+
+        shiftPlan[agent].forEach((shift, index) => {
+          const className = shift === "Leave" ? "leave" : shift === "Off" ? "off" : "working";
+          const td = document.createElement("td");
+          td.textContent = shift;
+          td.className = className;
+          td.setAttribute("data-day", index + 1);
+          row.appendChild(td);
+        });
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    function filterTable() {
+      const agentValue = document.getElementById("agentFilter").value;
+      const dayValue = document.getElementById("dayFilter").value;
+
+      document.querySelectorAll("#tableBody tr").forEach(row => {
+        const isVisibleAgent = !agentValue || row.getAttribute("data-agent") === agentValue;
+        row.style.display = isVisibleAgent ? "" : "none";
+
+        if (dayValue) {
+          row.querySelectorAll("td").forEach((td, index) => {
+            if (index > 0) {
+              td.style.display = (index === parseInt(dayValue)) ? "" : "none";
+            }
+          });
+        } else {
+          row.querySelectorAll("td").forEach((td, index) => {
+            td.style.display = "";
+          });
+        }
+      });
+    }
+
+    function exportTableToCSV(filename) {
+      let csv = [];
+      const rows = document.querySelectorAll("table tr");
+      for (let row of rows) {
+        const cols = row.querySelectorAll("td, th");
+        let rowData = [];
+        cols.forEach(col => rowData.push('"' + col.innerText + '"'));
+        csv.push(rowData.join(","));
+      }
+      const csvContent = csv.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.setAttribute("href", URL.createObjectURL(blob));
+      link.setAttribute("download", filename);
+      link.click();
+    }
+
+    document.addEventListener("DOMContentLoaded", renderTable);
+  </script>
+
+</body>
+</html>
